@@ -10,6 +10,25 @@ void setupIR() {
   IrSender.enableIROut(38);
 }
 
+void sendNECext(uint16_t address, uint16_t command, int_fast8_t repeats) {
+  uint8_t addressFirst  = address & 0xFF;
+  uint8_t addressSecond = (address >> 8) & 0xFF;
+
+  uint8_t commandFirst = command & 0xFF;
+  uint8_t commandSecond = (command >> 8) & 0xFF;
+
+  uint32_t rawData = ((uint32_t)commandFirst << 24) | 
+          ((uint32_t)commandSecond  << 16) |
+          ((uint32_t)addressFirst << 8)  |
+          ((uint32_t)addressSecond);
+
+  uint16_t finalAdr = ((uint16_t)addressSecond << 8) | addressFirst;
+
+  Serial.println(rawData, HEX);
+
+  IrSender.sendNECRaw(rawData, repeats);
+}
+
 void sendIR(String protocol, uint16_t address, uint16_t command, int_fast8_t repeats, uint32_t rawData) {
   //uint32_t rawData = 0x6F905583;
 
@@ -20,10 +39,12 @@ void sendIR(String protocol, uint16_t address, uint16_t command, int_fast8_t rep
     IrSender.sendNEC2(address, command, repeats);
   } else if (protocol.equalsIgnoreCase("Samsung")) {
     IrSender.sendSamsung(address, command, repeats);
-  } else if (protocol.equalsIgnoreCase("Onkyo") || protocol.equalsIgnoreCase("NECext")) {
+  } else if (protocol.equalsIgnoreCase("Onkyo")) {
     IrSender.sendOnkyo(address, command, repeats);
+  } else if (protocol.equalsIgnoreCase("NECext")) {
+    sendNECext(address, command, repeats);
   } else if (protocol.equalsIgnoreCase("NECRaw")) {
-    IrSender.sendNECRaw(rawData, 0);
+    IrSender.sendNECRaw(rawData, repeats);
   } else {
     Serial.println("Unknown protocol. :(");
   }

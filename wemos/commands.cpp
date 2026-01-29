@@ -23,7 +23,7 @@ void commandsLoop() {
 
       if (protocol.equalsIgnoreCase("NECRaw")) {
         int rawIndex = command.indexOf(' ', protocolIndex + 1);
-        uint32_t raw = command.substring(protocolIndex + 1, rawIndex).toInt();
+        uint32_t raw = strtoul(command.substring(protocolIndex + 1, rawIndex).c_str(), NULL, 32);
 
         int repeatsIndex = command.indexOf(' ', rawIndex + 1);
         int_fast8_t repeats = command.substring(rawIndex + 1, repeatsIndex).toInt();
@@ -34,10 +34,13 @@ void commandsLoop() {
       }
       
       int addressIndex = command.indexOf(' ', protocolIndex + 1);
-      uint16_t address = command.substring(protocolIndex + 1, addressIndex).toInt();
-
+      uint16_t address = strtoul(command.substring(protocolIndex + 1, addressIndex).c_str(), NULL, 16);
+    
       int commandIndex = command.indexOf(' ', addressIndex + 1);
-      uint16_t commandIR = command.substring(addressIndex + 1, commandIndex).toInt();
+      uint16_t commandIR = strtoul(command.substring(addressIndex + 1, commandIndex).c_str(), NULL, 16);
+
+      Serial.println("Command is: ");
+      Serial.print(commandIR);
 
       int repeatsIndex = command.indexOf(' ', commandIndex + 1);
       int_fast8_t repeats = command.substring(commandIndex + 1, repeatsIndex).toInt();
