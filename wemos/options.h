@@ -1,5 +1,5 @@
-#ifndef OPTIONS
-#define OPTIONS
+#ifndef OPTIONS_H
+#define OPTIONS_H
 
 //WiFi
 #define APSSID "ESPap"

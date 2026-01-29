@@ -7,6 +7,7 @@ String command;
 
 void showHelp() {
   Serial.println("ir <protocol> <address> <command> <repeats>");
+  Serial.println("ir <protocol> <raw> <repeats>");
 }
 
 void commandsLoop() {
@@ -20,6 +21,18 @@ void commandsLoop() {
       int protocolIndex = command.indexOf(' ');
       String protocol = command.substring(0, protocolIndex);
 
+      if (protocol.equalsIgnoreCase("NECRaw")) {
+        int rawIndex = command.indexOf(' ', protocolIndex + 1);
+        uint32_t raw = command.substring(protocolIndex + 1, rawIndex).toInt();
+
+        int repeatsIndex = command.indexOf(' ', rawIndex + 1);
+        int_fast8_t repeats = command.substring(rawIndex + 1, repeatsIndex).toInt();
+
+        sendIR(protocol, 0, 0, repeats, raw);
+
+        return;
+      }
+      
       int addressIndex = command.indexOf(' ', protocolIndex + 1);
       uint16_t address = command.substring(protocolIndex + 1, addressIndex).toInt();
 
@@ -29,6 +42,7 @@ void commandsLoop() {
       int repeatsIndex = command.indexOf(' ', commandIndex + 1);
       int_fast8_t repeats = command.substring(commandIndex + 1, repeatsIndex).toInt();
       Serial.println("Sending...");
+
       sendIR(protocol, address, commandIR, repeats);
     } else if (command.startsWith("radio")) {
 

@@ -1,5 +1,5 @@
-#ifndef COMMANDS
-#define COMMANDS
+#ifndef COMMANDS_H
+#define COMMANDS_H
 
 void commandsLoop();
 

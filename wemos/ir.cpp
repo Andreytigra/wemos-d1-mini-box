@@ -10,7 +10,9 @@ void setupIR() {
   IrSender.enableIROut(38);
 }
 
-void sendIR(String protocol, uint16_t address, uint16_t command, int_fast8_t repeats) {
+void sendIR(String protocol, uint16_t address, uint16_t command, int_fast8_t repeats, uint32_t rawData) {
+  //uint32_t rawData = 0x6F905583;
+
 
   if (protocol.equalsIgnoreCase("NEC")) {
     IrSender.sendNEC(address, command, repeats);
@@ -20,6 +22,8 @@ void sendIR(String protocol, uint16_t address, uint16_t command, int_fast8_t rep
     IrSender.sendSamsung(address, command, repeats);
   } else if (protocol.equalsIgnoreCase("Onkyo") || protocol.equalsIgnoreCase("NECext")) {
     IrSender.sendOnkyo(address, command, repeats);
+  } else if (protocol.equalsIgnoreCase("NECRaw")) {
+    IrSender.sendNECRaw(rawData, 0);
   } else {
     Serial.println("Unknown protocol. :(");
   }
