@@ -2,6 +2,7 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include "options.h"
+#include "web_page.h"
 
 const char *ssid = APSSID;
 const char *password = APPSK;
@@ -9,7 +10,7 @@ const char *password = APPSK;
 ESP8266WebServer server(80);
 
 void handleRoot() {
-  server.send(200, "text/html", "<h1>You are connected</h1>");
+  server.send(200, "text/html", index_html);
 }
 
 
