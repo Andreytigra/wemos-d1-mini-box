@@ -7,10 +7,10 @@
 void setup() {
   Serial.begin(115200);
   wifiSetup();
-  Serial.printf("Free heap: %u bytes\n", ESP.getFreeHeap());
-  delay(2000);
+  delay(10000);
   setupRadio();
   setupIR();
+  Serial.printf("Free heap after all: %u bytes\n", ESP.getFreeHeap());
 }
 
 bool asyncWait(unsigned long intervalMs) {

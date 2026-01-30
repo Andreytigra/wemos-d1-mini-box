@@ -45,12 +45,15 @@ void commandsLoop() {
       int repeatsIndex = command.indexOf(' ', commandIndex + 1);
       int_fast8_t repeats = command.substring(commandIndex + 1, repeatsIndex).toInt();
       Serial.println("Sending...");
-
+      
       sendIR(protocol, address, commandIR, repeats);
     } else if (command.startsWith("radio")) {
-
+      
     } else if (command.startsWith("help")) {
       showHelp();
+    } else if (command.startsWith("reboot")) {
+      Serial.println("Rebooting. Bye!");
+      ESP.restart();
     } else {
       Serial.println("Unknown command. :(");
       showHelp();

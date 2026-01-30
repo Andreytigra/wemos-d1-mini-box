@@ -9,6 +9,6 @@
 #define RADIO_SENDER_PIN  13
 
 #define IR_RECEIVE_PIN  4
-#define IR_SENDER_PIN 14
+#define IR_SENDER_PIN 12
 
 #endif

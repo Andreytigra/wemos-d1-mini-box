@@ -5,7 +5,7 @@
 bool IRReceiveEnabled = true;
 
 void setupIR() {
-  IrReceiver.begin(IR_RECEIVE_PIN);
+  IrReceiver.begin(IR_RECEIVE_PIN, DISABLE_LED_FEEDBACK);
   IrSender.begin(IR_SENDER_PIN); 
   IrSender.enableIROut(38);
 }
