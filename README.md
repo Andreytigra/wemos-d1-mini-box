@@ -8,5 +8,5 @@
 - Can use Flipper-IRDB.
 
 ### Dependencies
-- [IRremote]("https://github.com/Arduino-IRremote/Arduino-IRremote")
-- [rc-switch]("https://github.com/sui77/rc-switch")
+- [IRremote](https://github.com/Arduino-IRremote/Arduino-IRremote)
+- [rc-switch](https://github.com/sui77/rc-switch)
