@@ -25,28 +25,80 @@ const char index_html[] PROGMEM = R"=====(
     h1 {
         color: #03A062;
     }
+
     h2 {
         color: #03A062;
         margin-top: 20px;
     }
-    button {
+
+    button, input {
         padding: 10px 20px;
-        margin: 5px;
+        margin-top: 20px;
         font-size: 14px;
         cursor: pointer;
         border: none;
         border-radius: 4px;
-        background-color: #4CAF50;
+        background-color: #03A062;
         color: white;
         transition: background-color 0.3s;
     }
-    button:hover {
-        background-color: #45a049;
+
+    .controller-button, .log-button {
+      margin-top: 0px;
+      margin-bottom: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: 1px solid #03A062;
+      background-color: transparent;
+      width: 50%;
     }
-    button:active {
-        background-color: #3d8b40;
+
+    .controller, .log-messages {
+        flex: 1;
+        overflow-y: auto;
+        border: 1px solid #03A062;
+        border-radius: 8px;
+        padding: 10px;
+        background-color: #0D0208;
+        font-size: 12px;
+        color: #03A062;
     }
-    .controls, .logs {
+
+    .controller *, .log-messages * {
+        margin: 0px;
+    }
+
+    .hiden {
+        display: none;
+    }
+
+    .button-active {
+      background-color: #03A062;
+    }
+
+    .buttons-div {
+      display: flex;
+    }
+
+    .status-indicator {
+        padding: 10px 20px;
+        cursor: pointer;
+        border-radius: 4px;
+        background-color: #4c4c4c;
+        color: white;
+        transition: background-color 0.3s;
+    }
+
+    .status-on {
+        background-color: #03A062;
+    }
+
+    .status-off {
+        background-color: #bd0000;
+    }
+
+    .controls, .bottom {
         flex: 1;
         min-height: 0;
         border-style: solid;
@@ -58,92 +110,125 @@ const char index_html[] PROGMEM = R"=====(
         flex-direction: column;
     }
 
-    .log-messages {
-        flex: 1;
-        overflow-y: auto;
-        border: 1px solid #03A062;
-        border-radius: 8px;
-        padding: 10px;
-        background-color: #0D0208;
-        font-size: 12px;
-        color: #03A062;
-    }
     </style>
 </head>
 <body>
 
     <div class="controls">
-        <h1>Wemos Box</h1>
-
-        <button id="start-scan">Start Scan</button>
-        <button id="stop-scan">Stop Scan</button>
-        <button id="repeat-signal">Repeat Last Signal</button>
-    </div>
-
-    <div class="logs">
-        <h1>Logs</h1>
-        <div class="log-messages" id="log-messages">
-            <p>No logs yet. Waiting for commands...</p>
+        <h1>Wemos Toolbox</h1>
+        <button id="toggleIR" class="status-indicator">Toggle IR</button>
+        <div>
+            <form id="sendIRForm">
+            <button id="sendIRBtn" type="submit">Send IR</button>
+            <input type="text" name="protocol" placeholder="protocol" id="protocolIR">
+            <input type="text" name="address" placeholder="address" id="addressIR">
+            <input type="text" name="command" placeholder="command" id="commandIR">
+            <input type="text" name="repeats" placeholder="repeats" id="repeatsIR">
+            </form>
         </div>
     </div>
 
+    <div class="bottom">
+        <div class="buttons-div">
+            <button class="log-button button-active" id="log-button">Logs</button>
+            <button class="controller-button" id="controller-button">Controller</button>
+        </div>
+        <div class="controller hiden" id="controller"></div>
+        <div class="log-messages" id="log-messages"></div>
+    </div>
+
     <script>
-        const startScanBtn = document.getElementById('start-scan');
-        const stopScanBtn = document.getElementById('stop-scan');
+        const toggleIRBtn = document.getElementById('toggleIR');
+
         const repeatSignalBtn = document.getElementById('repeat-signal');
+
+        const controllerBtn = document.getElementById('controller-button');
+        const controller = document.getElementById('controller');
+
+        const sendIRBtn = document.getElementById('sendIRBtn');
+        const sendIRForm = document.getElementById('sendIRForm');
+
+        const logMessagesBtn = document.getElementById('log-button');
         const logMessages = document.getElementById('log-messages');
 
-        function addLog(message, type) {
-            type = type || 'info';
-            const timestamp = new Date().toLocaleTimeString();
-            let color = '';
-            if (type === 'error') color = 'color: red;';
-            else if (type === 'success') color = 'color: #03A062;';
-            logMessages.innerHTML += '<p style="' + color + '">[' + timestamp + '] ' + message + '</p>';
-            logMessages.scrollTop = logMessages.scrollHeight;
+        function updateLog() {
+          fetch('/log')
+                .then(response => response.text())
+                .then(data => {
+                    console.log(data);
+                    logMessages.innerHTML = '';
+
+                    data.split('\n').forEach(line => {
+                        if (line.trim() !== '') {
+                            logMessages.innerHTML += `<p>${line}</p>`;
+                        }
+                    });
+                    logMessages.scrollTop = logMessages.scrollHeight;
+                })
+                .catch(function(error) {
+                    console.error('Could not connect to device.', 'error');
+                });
         }
 
-        startScanBtn.addEventListener('click', function() {
-            addLog('Starting IR scan...');
+        function updateStatus(data) {
+            if (data.IRReceiveEnabled) {
+                toggleIRBtn.classList.remove('status-off');
+                toggleIRBtn.classList.add('status-on');
+            } else {
+                toggleIRBtn.classList.remove('status-on');
+                toggleIRBtn.classList.add('status-off');
+            }
+        }
+
+        logMessagesBtn.addEventListener('click', function() {
+          controller.classList.add("hiden");
+          logMessages.classList.remove("hiden");
+          controllerBtn.classList.remove("button-active")
+          logMessagesBtn.classList.add("button-active");
+
+          updateLog();
+        });
+
+        controllerBtn.addEventListener('click', function() {
+          logMessages.classList.add("hiden");
+          controller.classList.remove("hiden");
+          logMessagesBtn.classList.remove("button-active");
+          controllerBtn.classList.add("button-active");
+        });
+
+        toggleIRBtn.addEventListener('click', function() {
             fetch('/toggleIR')
-                .then(function(response) { return response.text(); })
-                .then(function(text) {
-                    addLog(text, 'success');
+                .then(response => response.text())
+                .then(text => {
+                    updateLog(text)
+
+                    return fetch('/status');
                 })
-                .catch(function(error) {
-                    addLog('Error: ' + error, 'error');
+                .then(response => response.json())
+                .then(data => {
+                    updateStatus(data);
+                })
+                .catch(error => {
+                    console.error('Error: ' + error, 'error');
                 });
         });
 
-        stopScanBtn.addEventListener('click', function() {
-            addLog('Stopping IR scan...');
-            fetch('/toggleIR')
-                .then(function(response) { return response.text(); })
-                .then(function(text) {
-                    addLog(text, 'success');
-                })
-                .catch(function(error) {
-                    addLog('Error: ' + error, 'error');
-                });
-        });
+        sendIRForm.addEventListener('submit', function(e) {
+            e.preventDefault();
 
-        repeatSignalBtn.addEventListener('click', function() {
-            addLog('Attempting to repeat last IR signal...');
-            fetch('/repeatSignal')
-                .then(function(response) { return response.text(); })
-                .then(function(text) {
-                    addLog(text, text.indexOf('✓') >= 0 ? 'success' : 'error');
-                })
-                .catch(function(error) {
-                    addLog('Error: ' + error, 'error');
-                });
+            fetch('/sendIR', {
+                method: 'POST',
+                body: new FormData(sendIRForm)
+            })
+
+            updateLog();
         });
 
         setInterval(function() {
             fetch('/status')
                 .then(function(response) { return response.json(); })
                 .then(function(data) {
-                    console.log('Status:', data);
+                    updateStatus(data);
                 })
                 .catch(function(error) {
                     console.error('Status error:', error);
@@ -151,19 +236,20 @@ const char index_html[] PROGMEM = R"=====(
         }, 3000);
 
         window.addEventListener('load', function() {
-            addLog('Web interface loaded.');
             fetch('/status')
                 .then(function(response) { return response.json(); })
                 .then(function(data) {
-                    addLog('Connected to device!', 'success');
+                    console.log('Connected to device!', 'success');
+                    updateStatus(data);
                 })
                 .catch(function(error) {
-                    addLog('Could not connect to device.', 'error');
+                    console.error('Could not connect to device.', 'error');
                 });
         });
     </script>
 </body>
 </html>
+
 
 )=====";
 

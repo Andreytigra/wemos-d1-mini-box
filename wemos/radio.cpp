@@ -4,7 +4,7 @@
 
 RCSwitch mySwitch = RCSwitch();
 
-bool radioReceiveEnabled = false;
+bool radioReceiveEnabled = true;
 
 void setupRadio() {
   mySwitch.enableReceive(RADIO_RECEIVE_PIN);
@@ -12,7 +12,10 @@ void setupRadio() {
 }
 
 void sendRadio(int nPulseLength, int decimalCode, int bitLength, int protocol = 1) {
-  Serial.println("Using protocol: " + protocol);
+  Serial.print("Using protocol: ");
+  Serial.println(protocol);
+
+  Serial.println("Sending radio.");
   
   mySwitch.setProtocol(protocol);
   mySwitch.setPulseLength(nPulseLength);
@@ -21,7 +24,16 @@ void sendRadio(int nPulseLength, int decimalCode, int bitLength, int protocol = 
 
 void radioLoop() {
   if (mySwitch.available()) {
-    Serial.println((mySwitch.getReceivedValue(), mySwitch.getReceivedBitlength(), mySwitch.getReceivedDelay(), mySwitch.getReceivedRawdata(),mySwitch.getReceivedProtocol()));
+
+    Serial.print("Decimal Code: ");
+    Serial.print(mySwitch.getReceivedValue());
+    Serial.print(" Bit Length: ");
+    Serial.print(mySwitch.getReceivedBitlength());
+    Serial.print(" Pulse Length: ");
+    Serial.print(mySwitch.getReceivedDelay());
+    Serial.print(" Protocol: ");
+    Serial.println(mySwitch.getReceivedProtocol());
+
     mySwitch.resetAvailable();
   }
 }

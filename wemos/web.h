@@ -3,5 +3,6 @@
 
 void wifiSetup();
 void wifiLoop();
+void sendText(String text);
 
 #endif

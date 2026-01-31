@@ -8,6 +8,8 @@ String command;
 void showHelp() {
   Serial.println("ir <protocol> <address> <command> <repeats>");
   Serial.println("ir <protocol> <raw> <repeats>");
+
+  Serial.println("radio <PulseLength> <decimalCode> <bitLength> <protocol>");
 }
 
 void commandsLoop() {
@@ -48,7 +50,23 @@ void commandsLoop() {
       
       sendIR(protocol, address, commandIR, repeats);
     } else if (command.startsWith("radio")) {
+      command.remove(0, 5);
+      command.trim(); 
       
+      int PulseLengthIndex = command.indexOf(' ');
+      int PulseLength = command.substring(0, PulseLengthIndex).toInt();
+
+      int decimalCodeIndex = command.indexOf(' ', PulseLengthIndex + 1);
+      int decimalCode = command.substring(PulseLengthIndex + 1, decimalCodeIndex).toInt();
+
+      int bitLengthIndex = command.indexOf(' ', decimalCodeIndex + 1);
+      int bitLength = command.substring(decimalCodeIndex + 1, bitLengthIndex).toInt();
+
+      int protocolIndex = command.indexOf(' ', bitLengthIndex + 1);
+      int protocol = command.substring(bitLengthIndex + 1, protocolIndex).toInt();
+
+      sendRadio(PulseLength, decimalCode, bitLength, protocol);
+
     } else if (command.startsWith("help")) {
       showHelp();
     } else if (command.startsWith("reboot")) {
