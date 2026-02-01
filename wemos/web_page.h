@@ -117,15 +117,23 @@ const char index_html[] PROGMEM = R"=====(
     <div class="controls">
         <h1>Wemos Toolbox</h1>
         <button id="toggleIR" class="status-indicator">Toggle IR</button>
-        <div>
-            <form id="sendIRForm">
+        <form id="sendIRForm">
             <button id="sendIRBtn" type="submit">Send IR</button>
             <input type="text" name="protocol" placeholder="protocol" id="protocolIR">
             <input type="text" name="address" placeholder="address" id="addressIR">
             <input type="text" name="command" placeholder="command" id="commandIR">
             <input type="text" name="repeats" placeholder="repeats" id="repeatsIR">
-            </form>
-        </div>
+        </form>
+
+        <button id="toggleRadio" class="status-indicator">Toggle Radio</button>
+        <form id="sendRadioForm">
+            <button id="sendRadioBtn" type="submit">Send Radio</button>
+            <input type="text" name="nPulseLength" placeholder="Pulse Length" id="nPulseLengthRadio">
+            <input type="text" name="decimalCode" placeholder="Decimal Code" id="decimalCodeRadio">
+            <input type="text" name="bitLength" placeholder="Bit Length" id="bitLengthRadio">
+            <input type="text" name="protocol" placeholder="Protocol" id="protocolRadio">
+        </form>
+
     </div>
 
     <div class="bottom">
@@ -139,14 +147,16 @@ const char index_html[] PROGMEM = R"=====(
 
     <script>
         const toggleIRBtn = document.getElementById('toggleIR');
+        const toggleRadioBtn = document.getElementById('toggleRadio');
 
         const repeatSignalBtn = document.getElementById('repeat-signal');
 
         const controllerBtn = document.getElementById('controller-button');
         const controller = document.getElementById('controller');
 
-        const sendIRBtn = document.getElementById('sendIRBtn');
         const sendIRForm = document.getElementById('sendIRForm');
+
+        const sendRadioForm = document.getElementById('sendRadioForm');
 
         const logMessagesBtn = document.getElementById('log-button');
         const logMessages = document.getElementById('log-messages');
@@ -178,6 +188,14 @@ const char index_html[] PROGMEM = R"=====(
                 toggleIRBtn.classList.remove('status-on');
                 toggleIRBtn.classList.add('status-off');
             }
+
+            if (data.radioReceiveEnabled) {
+                toggleRadioBtn.classList.remove('status-off');
+                toggleRadioBtn.classList.add('status-on');
+            } else {
+                toggleRadioBtn.classList.remove('status-on');
+                toggleRadioBtn.classList.add('status-off');
+            }
         }
 
         logMessagesBtn.addEventListener('click', function() {
@@ -200,7 +218,24 @@ const char index_html[] PROGMEM = R"=====(
             fetch('/toggleIR')
                 .then(response => response.text())
                 .then(text => {
-                    updateLog(text)
+                    updateLog(text);
+
+                    return fetch('/status');
+                })
+                .then(response => response.json())
+                .then(data => {
+                    updateStatus(data);
+                })
+                .catch(error => {
+                    console.error('Error: ' + error, 'error');
+                });
+        });
+
+        toggleRadioBtn.addEventListener('click', function() {
+            fetch('/toggleRadio')
+                .then(response => response.text())
+                .then(text => {
+                    updateLog(text);
 
                     return fetch('/status');
                 })
@@ -219,6 +254,17 @@ const char index_html[] PROGMEM = R"=====(
             fetch('/sendIR', {
                 method: 'POST',
                 body: new FormData(sendIRForm)
+            })
+
+            updateLog();
+        });
+
+        sendRadioForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            fetch('/sendRadio', {
+                method: 'POST',
+                body: new FormData(sendRadioForm)
             })
 
             updateLog();
@@ -246,11 +292,11 @@ const char index_html[] PROGMEM = R"=====(
                     console.error('Could not connect to device.', 'error');
                 });
         });
+
+        setInterval(updateLog, 2000);
     </script>
 </body>
 </html>
-
-
 )=====";
 
 #endif
