@@ -110,6 +110,10 @@ const char index_html[] PROGMEM = R"=====(
         flex-direction: column;
     }
 
+    .controls {
+        overflow-y: scroll;
+    }
+
     </style>
 </head>
 <body>
