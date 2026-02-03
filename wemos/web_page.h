@@ -34,6 +34,7 @@ const char index_html[] PROGMEM = R"=====(
     button, input {
         padding: 10px 20px;
         margin-top: 20px;
+        margin-bottom: 20px;
         font-size: 14px;
         cursor: pointer;
         border: none;
@@ -41,6 +42,11 @@ const char index_html[] PROGMEM = R"=====(
         background-color: #03A062;
         color: white;
         transition: background-color 0.3s;
+    }
+
+    form {
+        border: 1px solid #03A062;
+        border-radius: 8px;
     }
 
     .controller-button, .log-button {
@@ -129,6 +135,12 @@ const char index_html[] PROGMEM = R"=====(
             <input type="text" name="repeats" placeholder="repeats" id="repeatsIR">
         </form>
 
+        <form id="sendIRRawForm">
+            <button id="sendIRRawBtn" type="submit">Send IR Raw</button>
+            <input type="text" name="rawData" placeholder="rawData" id="rawIR">
+            <input type="text" name="repeats" placeholder="repeats" id="repeatsIR">
+        </form>
+
         <button id="toggleRadio" class="status-indicator">Toggle Radio</button>
         <form id="sendRadioForm">
             <button id="sendRadioBtn" type="submit">Send Radio</button>
@@ -159,7 +171,7 @@ const char index_html[] PROGMEM = R"=====(
         const controller = document.getElementById('controller');
 
         const sendIRForm = document.getElementById('sendIRForm');
-
+        const sendIRRawForm = document.getElementById('sendIRRawForm');
         const sendRadioForm = document.getElementById('sendRadioForm');
 
         const logMessagesBtn = document.getElementById('log-button');
@@ -258,6 +270,17 @@ const char index_html[] PROGMEM = R"=====(
             fetch('/sendIR', {
                 method: 'POST',
                 body: new FormData(sendIRForm)
+            })
+
+            updateLog();
+        });
+
+        sendIRRawForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            fetch('/sendIRRaw', {
+                method: 'POST',
+                body: new FormData(sendIRRawForm)
             })
 
             updateLog();

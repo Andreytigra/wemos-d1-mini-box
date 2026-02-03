@@ -47,6 +47,13 @@ void handleSendIR() {
   sendIR(protocol, address, commandIR, repeats);
 }
 
+void handleSendIRRaw() {
+  uint32_t raw = strtoul(server.arg("rawData").c_str(), NULL, 16);
+  int_fast8_t repeats = server.arg("repeats").toInt();
+  Serial.print("Raw data in web.cpp ");
+  sendIR("NECRaw", 0, 0, repeats, raw);
+}
+
 void handleSendRadio() {
   int nPulseLength = server.arg("nPulseLength").toInt();
   int decimalCode = server.arg("decimalCode").toInt();
@@ -68,6 +75,7 @@ void wifiSetup() {
   server.on("/toggleRadio", HTTP_GET, handleToggleRadio);
   server.on("/status", HTTP_GET, handleStatus);
   server.on("/sendIR", HTTP_POST, handleSendIR);
+  server.on("/sendIRRaw", HTTP_POST, handleSendIRRaw);
   server.on("/sendRadio", HTTP_POST, handleSendRadio);
   server.on("/log", handleLog);
 
