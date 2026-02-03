@@ -23,7 +23,7 @@ void sendNECext(uint16_t address, uint16_t command, int_fast8_t repeats) {
           ((uint32_t)commandSecond  << 16) |
           ((uint32_t)addressFirst << 8)  |
           ((uint32_t)addressSecond);
-
+  Serial.println("Debug Raw: " + String(rawData));
   IrSender.sendNECRaw(rawData, repeats);
 }
 
@@ -53,6 +53,7 @@ void sendIR(String protocol, uint16_t address, uint16_t command, int_fast8_t rep
   } else if (protocol.equalsIgnoreCase("NECext")) {
     sendNECext(address, command, repeats);
   } else if (protocol.equalsIgnoreCase("NECRaw")) {
+    Serial.println("Debug Raw: " + String(rawData));
     IrSender.sendNECRaw(rawData, repeats);
   } else {
     Serial.println("Unknown protocol. :(");

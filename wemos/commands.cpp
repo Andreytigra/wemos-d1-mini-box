@@ -25,7 +25,7 @@ void commandsLoop() {
 
       if (protocol.equalsIgnoreCase("NECRaw")) {
         int rawIndex = command.indexOf(' ', protocolIndex + 1);
-        uint32_t raw = strtoul(command.substring(protocolIndex + 1, rawIndex).c_str(), NULL, 32);
+        uint32_t raw = strtoul(command.substring(protocolIndex + 1, rawIndex).c_str(), NULL, 16);
 
         int repeatsIndex = command.indexOf(' ', rawIndex + 1);
         int_fast8_t repeats = command.substring(rawIndex + 1, repeatsIndex).toInt();
